@@ -20,6 +20,6 @@ public class CommandWrapper {
     }
 
     void invoke(Message message, String rawArgs){
-        command.runRaw(message,rawArgs);
+        command.runRaw(message, rawArgs);
     }
 }
