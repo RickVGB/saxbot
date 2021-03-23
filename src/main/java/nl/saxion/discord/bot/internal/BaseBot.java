@@ -86,26 +86,41 @@ public abstract class BaseBot extends ListenerAdapter {
         }
         String prefix = getPrefix(message.isFromGuild()?message.getGuild():null);
         String raw = message.getContentRaw();
-        if (raw.startsWith(prefix)){
-            // get command name
-            int nameStart = prefix.length();
-            int nameStop  = raw.indexOf(' ',nameStart);
-            String commandName = raw.substring(nameStop,nameStart);
+        if (raw.startsWith(prefix)) {
+            // Remove prefix from raw message
+            int prefixLength = prefix.length();
+            raw = raw.substring(prefixLength);
+
+            if (raw.isBlank()) {
+                // Is invalid command, ignore it
+                return;
+            }
+
+            // Get parts from the raw message
+            String[] messageParts = raw.split(" ", 2);
+
+            // Get command name
+            String commandName = messageParts[0];
 
             // get args
-            String rawArgs = raw.substring(nameStop);
+            String rawArgs = "";
+            if (messageParts.length > 1) {
+                rawArgs = messageParts[1];
+            }
 
             // find command
             CommandWrapper command = commandLookup.get(commandName.toLowerCase());
             if (command != null) {
                 // invoke command
                 command.invoke(message, rawArgs);
-            }else{
+            } else {
                 // no such command
-                onInvalidCommand(message,commandName);
+                onInvalidCommand(message, commandName);
             }
         }
     }
 
-    public void onInvalidCommand(Message message, String commandName){};
+    public void onInvalidCommand(Message message, String commandName) {
+        // TODO: Add error message?
+    };
 }
