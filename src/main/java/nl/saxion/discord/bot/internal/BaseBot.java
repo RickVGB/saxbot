@@ -1,7 +1,9 @@
 package nl.saxion.discord.bot.internal;
 
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import nl.saxion.discord.bot.Bot;
@@ -13,16 +15,16 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 public abstract class BaseBot extends ListenerAdapter {
     private final Map<String, CommandWrapper> commandLookup = new HashMap<>();
+    private final List<CommandWrapper> commandWrappers = new ArrayList<>();
 
     private void addCommand(Command command){
         // create a wrapper for the command
         CommandWrapper wrapper = new CommandWrapper(command);
+        commandWrappers.add(wrapper);
         // register command
         registerCommand(command.getName(),wrapper);
         // check for alias
@@ -33,6 +35,10 @@ public abstract class BaseBot extends ListenerAdapter {
                 registerCommand(commandAlias,wrapper);
             }
         }
+    }
+
+    public List<CommandWrapper> getCommandWrappers(){
+        return new ArrayList<>(commandWrappers);
     }
 
     private void registerCommand(String name, CommandWrapper wrapper){
@@ -86,41 +92,31 @@ public abstract class BaseBot extends ListenerAdapter {
         }
         String prefix = getPrefix(message.isFromGuild()?message.getGuild():null);
         String raw = message.getContentRaw();
-        if (raw.startsWith(prefix)) {
-            // Remove prefix from raw message
-            int prefixLength = prefix.length();
-            raw = raw.substring(prefixLength);
-
-            if (raw.isBlank()) {
-                // Is invalid command, ignore it
-                return;
+        if (raw.startsWith(prefix)){
+            // get command name
+            int nameStart = prefix.length();
+            int nameStop;
+            for (nameStop = nameStart;nameStop<raw.length();++nameStop){
+                if (Character.isWhitespace(raw.charAt(nameStop))){
+                    break;
+                }
             }
-
-            // Get parts from the raw message
-            String[] messageParts = raw.split(" ", 2);
-
-            // Get command name
-            String commandName = messageParts[0];
+            String commandName = raw.substring(nameStart,nameStop);
 
             // get args
-            String rawArgs = "";
-            if (messageParts.length > 1) {
-                rawArgs = messageParts[1];
-            }
+            String rawArgs = raw.substring(nameStop);
 
             // find command
             CommandWrapper command = commandLookup.get(commandName.toLowerCase());
             if (command != null) {
                 // invoke command
                 command.invoke(message, rawArgs);
-            } else {
+            }else{
                 // no such command
-                onInvalidCommand(message, commandName);
+                onInvalidCommand(message,commandName);
             }
         }
     }
 
-    public void onInvalidCommand(Message message, String commandName) {
-        // TODO: Add error message?
-    };
+    public void onInvalidCommand(Message message, String commandName){};
 }

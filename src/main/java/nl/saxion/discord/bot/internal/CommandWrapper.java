@@ -1,7 +1,12 @@
 package nl.saxion.discord.bot.internal;
 
 import net.dv8tion.jda.api.entities.Message;
+import nl.saxion.discord.bot.annotations.smartinvoke.SmartInvoke;
+import nl.saxion.discord.bot.annotations.smartinvoke.SmartInvokeCommand;
+import nl.saxion.discord.bot.internal.smartinvoke.invoke.SmartInvoker;
+import nl.saxion.discord.bot.internal.smartinvoke.tokenizer.TokenizationFailure;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -11,21 +16,32 @@ import java.util.Objects;
  */
 public class CommandWrapper {
 
-    private Command command;
+    private final Command command;
+    private final SmartInvoker smartInvoker;
 
     public CommandWrapper(Command command){
         this.command = Objects.requireNonNull(command);
+        Method[] methods = command.getClass().getMethods();
+        // add SmartInvoker if command is annotated with SmartInvokeCommand
+        if (command.getClass().getAnnotation(SmartInvokeCommand.class) != null) {
+            smartInvoker = new SmartInvoker(command);
+        }else{
+            smartInvoker = null;
+        }
     }
 
     public Command getCommand() {
         return command;
     }
 
-    protected void invoke(Message message, String rawArgs){
+    public void invoke(Message message, String rawArgs){
         command.runRaw(message, rawArgs);
 
         String[] args = extractArgs(rawArgs);
         command.run(message, args);
+        if (smartInvoker != null) {
+            smartInvoker.invoke(message, rawArgs);
+        }
     }
 
     private String[] extractArgs(String rawArgs) {

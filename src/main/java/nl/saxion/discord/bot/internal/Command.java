@@ -1,6 +1,9 @@
 package nl.saxion.discord.bot.internal;
 
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import nl.saxion.discord.bot.Bot;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
