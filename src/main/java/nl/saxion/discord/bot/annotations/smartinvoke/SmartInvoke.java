@@ -1,7 +1,7 @@
 package nl.saxion.discord.bot.annotations.smartinvoke;
 
 import nl.saxion.discord.bot.internal.smartinvoke.invoke.SmartInvoker;
-import nl.saxion.discord.bot.internal.smartinvoke.tokenizer.Tokenizer;
+import nl.saxion.discord.bot.internal.smartinvoke.tokenize.Tokenizer;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -32,6 +32,7 @@ public @interface SmartInvoke {
      * @return the invokeDoc of the command
      */
     String invokeDoc();
+
     /**
      * The flags to be used by the Tokenizer.
      * The default is most useful for most commands, but there may be a need

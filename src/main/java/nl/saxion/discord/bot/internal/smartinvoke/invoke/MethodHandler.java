@@ -5,11 +5,11 @@ import nl.saxion.discord.bot.annotations.smartinvoke.FixedSize;
 import nl.saxion.discord.bot.annotations.smartinvoke.ParamName;
 import nl.saxion.discord.bot.annotations.smartinvoke.SmartInvoke;
 import nl.saxion.discord.bot.internal.Command;
-import nl.saxion.discord.bot.internal.smartinvoke.InterpretationUtil;
+import nl.saxion.discord.bot.internal.smartinvoke.interpret.InterpretationUtil;
 import nl.saxion.discord.bot.internal.smartinvoke.invoke.params.*;
-import nl.saxion.discord.bot.internal.smartinvoke.tokenizer.TokenizationFailure;
-import nl.saxion.discord.bot.internal.smartinvoke.tokenizer.Tokenizer;
-import nl.saxion.discord.bot.internal.smartinvoke.tokenizer.TypeInterpretationResult;
+import nl.saxion.discord.bot.internal.smartinvoke.tokenize.TokenizationFailure;
+import nl.saxion.discord.bot.internal.smartinvoke.tokenize.Tokenizer;
+import nl.saxion.discord.bot.internal.smartinvoke.interpret.TypeInterpretationResult;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -19,7 +19,8 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 
 /**
- * A class that wraps around a {@link SmartInvoke command}
+ * A class that wraps around a {@link SmartInvoke command} method.
+ * This contains all data required for the {@link SmartInvoker SmartInvoker} to attempt to invoke a command method. and access information about the method
  */
 final class MethodHandler {
     private final SmartInvoke methodMeta;
@@ -55,6 +56,9 @@ final class MethodHandler {
         return methodMeta.priority();
     }
 
+    /**
+     * @return the flags used to invoke this method
+     */
     int getTokenizerFlags(){
         return this.methodMeta.tokenizerFlags();
     }
@@ -95,12 +99,12 @@ final class MethodHandler {
             try {
                  result = paramMetas[i].transform(message, tokenizer);
             }catch (NoSuchElementException nse){
-                return new InvocationFailure(i/paramMetas.length);
+                return new InvocationFailure((double)i/paramMetas.length);
             }
             if (result.isSuccess()) {
                 params[i + 1] = result.getResult();
             }else{
-                return new InvocationFailure(i/paramMetas.length);
+                return new InvocationFailure((double)i/paramMetas.length);
             }
         }
         // call the method

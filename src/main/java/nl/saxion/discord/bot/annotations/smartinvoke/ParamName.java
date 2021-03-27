@@ -11,5 +11,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
 public @interface ParamName {
+    /**
+     * @return The name of the parameter
+     */
     String value();
 }

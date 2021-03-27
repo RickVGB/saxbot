@@ -11,5 +11,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
 public @interface FixedSize {
+    /**
+     * @return the size of the array
+     */
     int value();
 }

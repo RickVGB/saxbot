@@ -28,15 +28,19 @@ public class RollDie extends Command {
     public void roll(Message message, @ParamName("dice") int dice, @ParamName("sides") int sides){
         if (sides < 0 || dice < 0){
             message.getChannel().sendMessage("The dice collapse in on themselves\nTotal: ???").queue();
+            return;
         }
         if (sides == 0){
             message.getChannel().sendMessage("the dice fall through the floor.\nTotal: no").queue();
+            return;
         }
         if (dice > MAX_DICE){
             message.getChannel().sendMessage("You cannot throw that many dice").queue();
+            return;
         }
         if (sides > MAX_SIDES){
             message.getChannel().sendMessage("The dice have become too round to roll").queue();
+            return;
         }
         int total = 0;
         int[] results = new int[dice];

@@ -1,6 +1,6 @@
-package nl.saxion.discord.bot.internal.smartinvoke.tokenizer.tokens;
+package nl.saxion.discord.bot.internal.smartinvoke.tokenize.tokens;
 
-import nl.saxion.discord.bot.internal.smartinvoke.tokenizer.Tokenizer;
+import nl.saxion.discord.bot.internal.smartinvoke.tokenize.Tokenizer;
 
 import javax.annotation.Nonnull;
 
@@ -29,6 +29,10 @@ public class Token {
         return raw;
     }
 
+    /**
+     * @return {@code true} if the token only contains whitespace. This is shorthand for {@code token.getRaw().isBlank()}.
+     * @see String#isBlank()
+     */
     public boolean isBlank(){
         return raw.isBlank();
     }

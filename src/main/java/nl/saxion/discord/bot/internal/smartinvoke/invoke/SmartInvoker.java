@@ -4,9 +4,9 @@ import net.dv8tion.jda.api.entities.Message;
 import nl.saxion.discord.bot.annotations.smartinvoke.SmartInvoke;
 import nl.saxion.discord.bot.annotations.smartinvoke.SmartInvokeCommand;
 import nl.saxion.discord.bot.internal.Command;
-import nl.saxion.discord.bot.internal.smartinvoke.tokenizer.OnDemandTokenizer;
-import nl.saxion.discord.bot.internal.smartinvoke.tokenizer.TokenizationFailure;
-import nl.saxion.discord.bot.internal.smartinvoke.tokenizer.Tokenizer;
+import nl.saxion.discord.bot.internal.smartinvoke.tokenize.OnDemandTokenizer;
+import nl.saxion.discord.bot.internal.smartinvoke.tokenize.TokenizationFailure;
+import nl.saxion.discord.bot.internal.smartinvoke.tokenize.Tokenizer;
 
 import java.lang.reflect.*;
 import java.util.*;
@@ -15,8 +15,19 @@ import java.util.*;
  * An invoker that can invoke various {@link SmartInvoke SmartInvoke} methods of a {@link SmartInvokeCommand SmartInvoke command}.
  */
 public final class SmartInvoker {
+    /**
+     * The annotation used to mark this command. This may contain
+     * The annotation used to mark this command. This may contain configuration of the invoker itself
+     */
     private final SmartInvokeCommand invokeMeta;
+    /**
+     * The command the invoker is based on. This is used to call the methods
+     */
     private final Command command;
+    /**
+     * A list of handlers where each handler is bound to a method annotated with the {@link SmartInvoke SmartInvoke} annotation.
+     * These are used to invoke the methods themselves
+     */
     private final List<MethodHandler> methods;
 
     /**

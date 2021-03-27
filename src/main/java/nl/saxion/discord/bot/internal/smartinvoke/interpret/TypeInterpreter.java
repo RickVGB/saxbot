@@ -1,7 +1,7 @@
-package nl.saxion.discord.bot.internal.smartinvoke.tokenizer;
+package nl.saxion.discord.bot.internal.smartinvoke.interpret;
 
 import net.dv8tion.jda.api.entities.Message;
-import nl.saxion.discord.bot.internal.smartinvoke.tokenizer.tokens.Token;
+import nl.saxion.discord.bot.internal.smartinvoke.tokenize.tokens.Token;
 
 /**
  * An interface whose instances can be used to parse a token as a given type

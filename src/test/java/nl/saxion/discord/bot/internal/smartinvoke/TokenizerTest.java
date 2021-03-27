@@ -1,8 +1,8 @@
 package nl.saxion.discord.bot.internal.smartinvoke;
 
-import nl.saxion.discord.bot.internal.smartinvoke.tokenizer.Tokenizer;
-import nl.saxion.discord.bot.internal.smartinvoke.tokenizer.TokenizationFailure;
-import nl.saxion.discord.bot.internal.smartinvoke.tokenizer.OnDemandTokenizer;
+import nl.saxion.discord.bot.internal.smartinvoke.tokenize.Tokenizer;
+import nl.saxion.discord.bot.internal.smartinvoke.tokenize.TokenizationFailure;
+import nl.saxion.discord.bot.internal.smartinvoke.tokenize.OnDemandTokenizer;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;

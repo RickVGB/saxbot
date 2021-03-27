@@ -1,10 +1,8 @@
 package nl.saxion.discord.bot.internal;
 
 import net.dv8tion.jda.api.entities.Message;
-import nl.saxion.discord.bot.annotations.smartinvoke.SmartInvoke;
 import nl.saxion.discord.bot.annotations.smartinvoke.SmartInvokeCommand;
 import nl.saxion.discord.bot.internal.smartinvoke.invoke.SmartInvoker;
-import nl.saxion.discord.bot.internal.smartinvoke.tokenizer.TokenizationFailure;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;

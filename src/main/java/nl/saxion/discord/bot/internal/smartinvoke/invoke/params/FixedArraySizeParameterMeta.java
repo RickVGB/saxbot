@@ -1,8 +1,8 @@
 package nl.saxion.discord.bot.internal.smartinvoke.invoke.params;
 
-import nl.saxion.discord.bot.internal.smartinvoke.tokenizer.TokenizationFailure;
-import nl.saxion.discord.bot.internal.smartinvoke.tokenizer.Tokenizer;
-import nl.saxion.discord.bot.internal.smartinvoke.tokenizer.tokens.Token;
+import nl.saxion.discord.bot.internal.smartinvoke.tokenize.TokenizationFailure;
+import nl.saxion.discord.bot.internal.smartinvoke.tokenize.Tokenizer;
+import nl.saxion.discord.bot.internal.smartinvoke.tokenize.tokens.Token;
 
 import java.util.ArrayList;
 import java.util.List;

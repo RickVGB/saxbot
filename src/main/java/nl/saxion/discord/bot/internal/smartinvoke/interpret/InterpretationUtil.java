@@ -1,10 +1,8 @@
-package nl.saxion.discord.bot.internal.smartinvoke;
+package nl.saxion.discord.bot.internal.smartinvoke.interpret;
 
 import net.dv8tion.jda.api.entities.*;
-import nl.saxion.discord.bot.internal.smartinvoke.tokenizer.TypeInterpretationResult;
-import nl.saxion.discord.bot.internal.smartinvoke.tokenizer.TypeInterpreter;
-import nl.saxion.discord.bot.internal.smartinvoke.tokenizer.tokens.SnowflakeMentionToken;
-import nl.saxion.discord.bot.internal.smartinvoke.tokenizer.tokens.Token;
+import nl.saxion.discord.bot.internal.smartinvoke.tokenize.tokens.SnowflakeMentionToken;
+import nl.saxion.discord.bot.internal.smartinvoke.tokenize.tokens.Token;
 
 import javax.annotation.RegEx;
 import java.lang.reflect.Array;
@@ -13,13 +11,16 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
-import static nl.saxion.discord.bot.internal.smartinvoke.tokenizer.TypeInterpretationResult.*;
+import static nl.saxion.discord.bot.internal.smartinvoke.interpret.TypeInterpretationResult.*;
 /**
  * An utility class containing functions that help with converting types
  */
 public class InterpretationUtil {
     private InterpretationUtil(){} // no instances
 
+    /**
+     * A map containing all known data about conversion from a {@link Token token} to a given type.
+     */
     private static final Map<Class<?>,InterpretationBundle<?>> bundles = new HashMap<>();
 
     /**
@@ -31,6 +32,12 @@ public class InterpretationUtil {
         return bundles.containsKey(cls);
     }
 
+    /**
+     * Fetches the bundle of a given type
+     * @param type the type to get the bundle of
+     * @return the InterpretationBundle associated with the given type
+     * @throws NoSuchElementException if no conversion to the given type can be done
+     */
     private static InterpretationBundle<?> getBundle(Class<?> type){
         InterpretationBundle<?> bundle = bundles.get(type);
         if (bundle == null){
@@ -95,17 +102,32 @@ public class InterpretationUtil {
             INTERPRETERS BELOW
      */
 
+    /**
+     * Adds an interpreter of a given type
+     * @param cls the class that can be interpreted as
+     * @param interpreter the interpreter to use for interpretation
+     * @param typeHint the type hint associated with the given class
+     * @param <T> the type that can be interpreted as
+     */
     private static <T> void addInterpreter(Class<T> cls, TypeInterpreter<T> interpreter, String typeHint){
         bundles.put(cls, new InterpretationBundle<T>(typeHint,interpreter));
     }
 
+    /**
+     * Adds an interpreter for a primitive type
+     * @param primitive the primitive class of the primitive type. e.g. {@code int}
+     * @param wrapper the wrapper class of the primitive type. e.g. {@link Integer}
+     * @param interpreter the interpreter to use for interpretation
+     * @param typeHint the hint to associate with the given type
+     * @param <T> the type of the primitive
+     */
     private static <T> void putPrimitiveInterpreter(Class<T> primitive,Class<T> wrapper,TypeInterpreter<T> interpreter, String typeHint){
         InterpretationBundle<T> bundle = new InterpretationBundle<>(typeHint, interpreter);
         bundles.put(primitive,bundle);
         bundles.put(wrapper  ,bundle);
     }
 
-    static{
+    static{// add interpretation bindings
         // primitives
         putPrimitiveInterpreter(int   .class,Integer.class, new NumberTokenParser<>(Integer::parseInt   ,"-?\\d{1,10}"),"integer");
         putPrimitiveInterpreter(double.class,Double .class, new NumberTokenParser<>(Double ::parseDouble,"-?\\d+(\\.\\d+)?"),"number");
@@ -120,77 +142,5 @@ public class InterpretationUtil {
         addInterpreter(Member      .class, new SnowflakeMentionParser<>(Member      .class,Message::getMentionedMembers    ),"user");
         addInterpreter(TextChannel .class, new SnowflakeMentionParser<>(TextChannel .class,Message::getMentionedChannelsBag),"channel");
         addInterpreter(Emote       .class, new SnowflakeMentionParser<>(Emote       .class,Message::getEmotesBag           ),"emote");
-    }
-
-    /**
-     * A TypeInterpreter that wraps parsing functions for numbers that are only expected to throw {@link NumberFormatException NumberFormatExceptions} when passed bad data
-     * @param <Type> the type of the number the parser can parse
-     */
-    private static class NumberTokenParser<Type extends Number> implements TypeInterpreter<Type>{
-        private final Function<String,Type> parser;
-        private final Pattern pattern;
-        /**
-         * Creates a NumberTokenParser
-         * @param parser the parser that can parse the given types
-         */
-        public NumberTokenParser(Function<String, Type> parser, @RegEx String regex) {
-            this.parser = parser;
-            this.pattern = Pattern.compile(regex);
-        }
-
-        @Override
-        public TypeInterpretationResult<Type> interpret(Message context, Token token){
-            String raw = token.getRaw();
-            if (!pattern.matcher(raw).matches()){
-                return failure();
-            }
-            try{
-                return success(parser.apply(token.getRaw()));
-            }catch (NumberFormatException nfe){
-                return failure();
-            }
-        }
-    }
-
-    /**
-     * A TypeInterpreter that helps with finding parsed mentions
-     * @param <Mention>
-     */
-    private static class SnowflakeMentionParser<Mention extends IMentionable> implements TypeInterpreter<Mention> {
-        private final Class<Mention> targetType;
-        private final Function<Message,? extends Collection<Mention>> mentionTypeGetter;
-
-        public SnowflakeMentionParser(Class<Mention> targetType, Function<Message, ? extends Collection<Mention>> mentionTypeGetter) {
-            this.targetType = targetType;
-            this.mentionTypeGetter = mentionTypeGetter;
-        }
-
-        @Override
-        public TypeInterpretationResult<Mention> interpret(Message context, Token token) {
-            if (!(token instanceof SnowflakeMentionToken)){
-                return failure();
-            }
-            Collection<Mention> mentions = mentionTypeGetter.apply(context);
-            for (Mention mention : mentions){
-                if (mention.getIdLong() == ((SnowflakeMentionToken) token).getId()){
-                    return success(mention);
-                }
-            }
-            throw new NoSuchElementException("No "+targetType.getName()+" found in the message");
-        }
-    }
-
-    /**
-     * A bundle of data about supported types
-     * @param <Type> the type of the data supported
-     */
-    private static final class InterpretationBundle<Type> {
-        private final String typeHint;
-        private final TypeInterpreter<Type> interpreter;
-
-        public InterpretationBundle(String typeHint, TypeInterpreter<Type> interpreter) {
-            this.typeHint = Objects.requireNonNull(typeHint);
-            this.interpreter = Objects.requireNonNull(interpreter);
-        }
     }
 }

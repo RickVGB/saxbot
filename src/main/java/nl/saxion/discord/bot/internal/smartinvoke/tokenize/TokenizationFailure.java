@@ -1,4 +1,4 @@
-package nl.saxion.discord.bot.internal.smartinvoke.tokenizer;
+package nl.saxion.discord.bot.internal.smartinvoke.tokenize;
 
 /**
  * An exception thrown when the tokenizer cannot parse a message.

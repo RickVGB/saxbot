@@ -1,8 +1,8 @@
-package nl.saxion.discord.bot.internal.smartinvoke.tokenizer;
+package nl.saxion.discord.bot.internal.smartinvoke.tokenize;
 
-import nl.saxion.discord.bot.internal.smartinvoke.tokenizer.tokens.MentionToken;
-import nl.saxion.discord.bot.internal.smartinvoke.tokenizer.tokens.SnowflakeMentionToken;
-import nl.saxion.discord.bot.internal.smartinvoke.tokenizer.tokens.Token;
+import nl.saxion.discord.bot.internal.smartinvoke.tokenize.tokens.MentionToken;
+import nl.saxion.discord.bot.internal.smartinvoke.tokenize.tokens.SnowflakeMentionToken;
+import nl.saxion.discord.bot.internal.smartinvoke.tokenize.tokens.Token;
 
 import javax.annotation.Nonnull;
 

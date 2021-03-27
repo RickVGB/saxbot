@@ -1,15 +1,14 @@
-package nl.saxion.discord.bot.internal.smartinvoke.tokenizer;
+package nl.saxion.discord.bot.internal.smartinvoke.tokenize;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.utils.MiscUtil;
-import nl.saxion.discord.bot.internal.smartinvoke.tokenizer.tokens.MentionToken;
-import nl.saxion.discord.bot.internal.smartinvoke.tokenizer.tokens.SnowflakeMentionToken;
-import nl.saxion.discord.bot.internal.smartinvoke.tokenizer.tokens.Token;
+import nl.saxion.discord.bot.internal.smartinvoke.tokenize.tokens.MentionToken;
+import nl.saxion.discord.bot.internal.smartinvoke.tokenize.tokens.SnowflakeMentionToken;
+import nl.saxion.discord.bot.internal.smartinvoke.tokenize.tokens.Token;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -94,8 +93,6 @@ public class OnDemandTokenizer extends Tokenizer {
     private @Nonnull Token parseNext() throws TokenizationFailure {
         // skip to next token
         char current = source.charAt(caret);
-
-//        System.out.println("src["+caret+"]='"+current+'\'');
         switch (current){
             case '<':
                 // attempt to parse as mention
